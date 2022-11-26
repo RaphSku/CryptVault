@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "cryptvault"
+version = "0.1.0"
+description = ""
+authors = ["RapSku <raphaelskuza@gmail.com>"]
+repository = "https://github.com/RaphSku/CryptVault"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["encryption", "vault", "server", "cli"]
+exclude = ["./tests/"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+cryptography = "^38.0.3"
+fastapi = "^0.87.0"
+uvicorn = "^0.20.0"
+pyarrow = "^10.0.0"
+pandas = "^1.5.1"
+click = "^8.1.3"
+requests = "^2.28.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+cryptvault = 'cryptvault.main:main'
