@@ -7,7 +7,7 @@ repository = "https://github.com/RaphSku/CryptVault"
 readme = "README.md"
 license = "Apache-2.0"
 keywords = ["encryption", "vault", "server", "cli"]
-exclude = ["/tests"]
+exclude = ["./tests/"]
 
 [tool.poetry.dependencies]
 python = "^3.10"

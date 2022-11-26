@@ -4,6 +4,7 @@ import uuid
 import requests
 import json
 
+from cryptvault.vault import Secret
 
 @attrs.define()
 class Client:
@@ -17,7 +18,7 @@ class Client:
         self.__create_guid()
 
 
-    def get_secret(self, context: str, key: str):
+    def get_secret(self, context: str, key: str) -> str:
         with open('~/.cryptvault/guid', 'r') as file:
             guid = file.read()
         response = requests.get(url = f"{self.host}:{self.port}/cryptvault",
@@ -28,7 +29,16 @@ class Client:
                         })
 
         content  = json.loads(response.json())
-        print(content)
+        
+        return content["value"]
+
+
+    def post_secrets(self, guid: str, context: str, secrets: list[Secret]) -> None:
+        requests.post(url = f"{self.host}:{self.port}/cryptvault", data = {
+            'guid': guid,
+            'context': context,
+            'secrets': [{"key": secret.key, "value": secret.value} for secret in secrets]
+        })
 
     
     def __create_guid(self):

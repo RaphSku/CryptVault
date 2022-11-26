@@ -1,6 +1,5 @@
 import os
 import base64
-import glob
 import re
 import pandas as pd
 import pyarrow
@@ -38,7 +37,15 @@ class RegisterManager(RegisterHandle):
 
     
     def __parse_registries(self):
-        registries = glob.glob(f"{self.base_path}/*.parquet")
+        files = os.listdir(f"{self.base_path}")
+
+        registries = []
+        for file in files:
+            try:
+                parquet_file = re.findall(".*.parquet", file)[0]
+            except IndexError:
+                continue
+            registries.append(f"{self.base_path}/{parquet_file}")
 
         for registry in registries:
             regex_search = re.findall(r"\/.*(?=_secrets\.)", registry)[0]
