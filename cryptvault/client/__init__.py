@@ -1,0 +1,1 @@
+from cryptvault.client.base import Client

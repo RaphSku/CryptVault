@@ -1,52 +1,81 @@
 import os
 import base64
+import glob
+import re
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
 
 from pathlib import Path 
 
-from cryptvault.vault import Secret
+from cryptvault.vault.secret import Secret, EncryptedSecret
+from cryptvault.vault.encrypt import encrypt_secrets
 
 
-class Registry:
-    path_to_log: Path = Path('./logs')
-
-    def __init__(self, path: Path, context: str, hash_secret_key: bytes) -> None:
-        self.path            = path
-        self.context         = context
-        self.hash_secret_key = hash_secret_key
+class RegisterHandle:
+    base_path: Path = os.path.expanduser("~/cryptvault")
 
 
-    def store_secrets(self, encrypted_secrets: list[Secret]):
-        base_dir   = f'{self.path}'
-        target_dir = f'{self.path}/{self.context}'
-        if not os.path.exists(base_dir):
-            os.mkdir(base_dir)
+class RegisterManager(RegisterHandle):
+    def __init__(self) -> None:
+        self.registries = {}
 
-        if not os.path.exists(target_dir):
-            os.mkdir(target_dir)
+        self.__parse_registries()
+
+    
+    def get_secret_key(self, context: str) -> bytes:
+        with open(f'{self.base_path}/{context}.txt', 'r') as file:
+            secret_key = base64.b64decode(file.read())
+
+        return secret_key
+
+
+    def get_encrypted_secret(self, context: str, key: str) -> EncryptedSecret:
+        df_encrypted_secret    = pq.read_table(self.registries[context], columns = [key]).to_pandas()
+        encrypted_secret_value = df_encrypted_secret[key].iloc[0]
+
+        return EncryptedSecret(key = key, value = bytes(encrypted_secret_value))
+
+    
+    def __parse_registries(self):
+        registries = glob.glob(f"{self.base_path}/*.parquet")
+
+        for registry in registries:
+            regex_search = re.findall(r"\/.*(?=_secrets\.)", registry)[0]
+            context      = regex_search.split("/")[-1]
+            self.registries[context] = registry
+
+
+class Registry(RegisterHandle):
+    def __init__(self, context: str, secret_key: bytes) -> None:
+        self.context = context
+
+        self.__create_registry_directory()
+        self.__store_secret_key(secret_key)
+
+
+    def store_secrets(self, secrets: list[Secret]):
+        with open(f'{self.base_path}/{self.context}.txt', 'r') as file:
+            secret_key = base64.b64decode(file.read())
+
+        encrypted_secrets = encrypt_secrets(secrets, secret_key = secret_key)
 
         secrets_in = {}
-        for secret in encrypted_secrets:
-            secrets_in[secret.key] = secret.value
+        for encrypted_secret in encrypted_secrets:
+            secrets_in[encrypted_secret.key] = encrypted_secret.value
 
         df_secrets = pd.DataFrame(data = secrets_in, index = ["value"])
         table      = pyarrow.Table.from_pandas(df_secrets)
 
-        pq.write_table(table, f'{target_dir}/secrets.parquet')
+        target_file = f'{self.base_path}/{self.context}_secrets.parquet'
+        pq.write_table(table, target_file)
 
-        self.__create_registry_entry(target_dir)
+
+    def __store_secret_key(self, secret_key: bytes):
+        with open(f'{self.base_path}/{self.context}.txt', 'w') as file:
+            file.write(base64.b64encode(secret_key).decode('utf-8'))
 
 
-    def __create_registry_entry(self, target_dir: str):
-        if not os.path.exists(self.path_to_log):
-            os.mkdir(self.path_to_log)
-
-        if not os.path.exists(f"{self.path_to_log}/{self.context}"):
-            os.mkdir(f"{self.path_to_log}/{self.context}")
-
-        with open(f'{self.path_to_log}/{self.context}/path.txt', 'w') as file:
-            file.write(f"{target_dir}-")
-            file.write(base64.b64encode(self.hash_secret_key).decode('utf-8'))
-            
+    def __create_registry_directory(self):
+        if not os.path.exists(self.base_path):
+            os.mkdir(self.base_path)

@@ -1,30 +1,20 @@
-import re
-import pyarrow.parquet as pq
+from fastapi import APIRouter, Body
 
-from fastapi import APIRouter
-
-from cryptvault.vault import decrypt_secret
+from cryptvault.vault import decrypt_secret, create_hashed_secret_key, RegisterManager, RequestSecret
 
 
 get_router = APIRouter()
 
 @get_router.get("/cryptvault")
-async def getSecret(context: str, key: str):
-    with open(f'./logs/{context}/path.txt', 'r') as file:
-        target = file.read()
+async def getSecret(request: RequestSecret = Body(embed = False)):
+    guid = create_hashed_secret_key(request.guid)
 
-    result = re.findall(".\/\w*", target)
+    register_manager = RegisterManager()
+    secret_key       = register_manager.get_secret_key(context = request.context)
+    if secret_key != guid:
+        return {'error': 'guid does not match...access denied'}
 
-    result2 = re.findall("b'.*", target)
+    encrypted_secret = register_manager.get_encrypted_secret(context = request.context, key = request.key)
+    secret           = decrypt_secret(secret = encrypted_secret, secret_key = secret_key)
 
-    table = pq.read_table(f'{result[0][:-1]}/secrets.parquet')
-    df = table.to_pandas()
-
-    secret = df[key].iloc[0]
-
-    return decrypt_secret(secret = secret, hash_secret_key = bytes(result2[0], encoding = 'utf-8'))
-
-
-@get_router.get("/cryptvault/{context}")
-async def getSecretsByContext(context: str):
-    pass
+    return secret

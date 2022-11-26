@@ -29,4 +29,5 @@ def start(host, port):
     Starts the CryptVault Server on port 8000 by default, after start-up the server
     accepts requests.
     """
+    # TODO: Use TLS! for non localhost deployment
     uvicorn.run("cryptvault.main:cryptvault_server", host = host, port = int(port))

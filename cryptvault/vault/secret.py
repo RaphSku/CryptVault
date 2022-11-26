@@ -15,5 +15,12 @@ class EncryptedSecret:
 
 
 class InSecrets(BaseModel):
+    guid: str
     context: str
     secrets: list[Secret]
+
+
+class RequestSecret(BaseModel):
+    guid: str
+    context: str
+    key: str
