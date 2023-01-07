@@ -2,7 +2,7 @@
 name = "cryptvault"
 version = "0.1.0"
 description = ""
-authors = ["RapSku <raphaelskuza@gmail.com>"]
+authors = ["RapSku <rapsku.dev@gmail.com>"]
 repository = "https://github.com/RaphSku/CryptVault"
 readme = "README.md"
 license = "Apache-2.0"
