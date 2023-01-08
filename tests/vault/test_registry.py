@@ -6,14 +6,8 @@ from cryptvault.vault import (
     RegisterManager,
     Secret, 
 )
-from ..fixtures import secrets, secret_key
-
-
-def cleanup():
-    base_path = os.path.expanduser("~/cryptvault")
-    os.remove(f"{base_path}/test_secrets.parquet")
-    os.remove(f"{base_path}/test.txt")
-    os.rmdir(f"{base_path}")
+from ..fixtures       import secrets, secret_key
+from ..utilities      import cleanup_base_path
 
 
 class TestRegistry:
@@ -35,7 +29,7 @@ class TestRegistry:
         assert all(df.columns == ['key1', 'key2'])
         assert df.index.values[0] == 'value'
 
-        cleanup()
+        cleanup_base_path()
 
 
     def test_store_secrets_s02(self, secret_key: str, secrets: list[Secret]):
@@ -44,7 +38,7 @@ class TestRegistry:
 
         assert os.path.exists(f'{registry.base_path}/test.txt')
 
-        cleanup()
+        cleanup_base_path()
 
 
 class TestRegisterManager:
@@ -56,7 +50,7 @@ class TestRegisterManager:
         
         assert register_manager.registries == {'test': f"{register_manager.base_path}/test_secrets.parquet"}
 
-        cleanup()
+        cleanup_base_path()
 
 
     def test_register_manager_secret_key_retrieval_s01(self, secret_key: str, secrets: list[Secret]):
@@ -68,7 +62,7 @@ class TestRegisterManager:
 
         assert isinstance(secret_key, bytes)
 
-        cleanup()
+        cleanup_base_path()
 
 
     def test_register_manager_encrypted_secret_retrieval_s01(self, secret_key: str, secrets: list[Secret]):
@@ -81,4 +75,4 @@ class TestRegisterManager:
         assert encrypted_secret.key == secrets[0].key
         assert isinstance(encrypted_secret.value, bytes)
 
-        cleanup()
+        cleanup_base_path()

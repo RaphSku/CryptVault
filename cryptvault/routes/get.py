@@ -6,15 +6,15 @@ from cryptvault.vault import decrypt_secret, create_hashed_secret_key, RegisterM
 get_router = APIRouter()
 
 @get_router.get("/cryptvault")
-async def getSecret(request: RequestSecret = Body(embed = False)):
-    guid = create_hashed_secret_key(request.guid)
+async def getSecret(guid: str, context: str, key: str):
+    guid = create_hashed_secret_key(guid)
 
     register_manager = RegisterManager()
-    secret_key       = register_manager.get_secret_key(context = request.context)
+    secret_key       = register_manager.get_secret_key(context = context)
     if secret_key != guid:
         return {'error': 'guid does not match...access denied'}
 
-    encrypted_secret = register_manager.get_encrypted_secret(context = request.context, key = request.key)
+    encrypted_secret = register_manager.get_encrypted_secret(context = context, key = key)
     secret           = decrypt_secret(secret = encrypted_secret, secret_key = secret_key)
 
     return secret
