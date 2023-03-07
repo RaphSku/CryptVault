@@ -13,7 +13,7 @@ class CustomGroup(click.Group):
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
 
-        title = """
+        title = r"""
    ___                 _                    _ _   
   / __\ __ _   _ _ __ | |_/\   /\__ _ _   _| | |_ 
  / / | '__| | | | '_ \| __\ \ / / _` | | | | | __|
