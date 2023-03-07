@@ -28,14 +28,12 @@ class CustomGroup(click.Group):
 
         # structure: [15][2 whitespaces][5 whitespaces][80], total = 102c
         commands  = [
-            "help",
             "version",
             "start",
             "generate"
         ]
 
         descriptions = [
-            "If you need help, here I am.",
             "If you forgot with which version you are working, use me.",
             "Start me already. Kick off this CryptVault server.",
             "If you need a JSON template of the body for posting a request, let me know."
