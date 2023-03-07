@@ -7,6 +7,7 @@ from cryptvault.main    import cryptvault_server
 
 client = TestClient(cryptvault_server)
 
+
 class TestPostRouter:
     def test_post_s01(self, secrets):
         body     = {

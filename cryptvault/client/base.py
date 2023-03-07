@@ -2,9 +2,9 @@ import os
 import attrs
 import uuid
 import requests
-import json
 
 from cryptvault.vault import Secret
+
 
 @attrs.define()
 class Client:
@@ -18,31 +18,33 @@ class Client:
         self.__create_guid()
 
 
-    def get_secret(self, context: str, key: str) -> str:
-        with open('~/.cryptvault/guid', 'r') as file:
+    def get_secret(self, context: str, key: str) -> tuple[str, int]:
+        guid_path = os.path.expanduser('~/.cryptvault/guid')
+        with open(guid_path, 'r') as file:
             guid = file.read()
-        response = requests.get(url = f"{self.host}:{self.port}/cryptvault",
-                        data = {
-                            'guid': guid,
-                            'context': context,
-                            'key': key
-                        })
+        response = requests.get(url = f"{self.host}:{self.port}/cryptvault?guid={guid}&context={context}&key={key}")
+        content  = response.json()
 
-        content  = json.loads(response.json())
-        
-        return content["value"]
+        return content["value"], response.status_code
 
 
-    def post_secrets(self, guid: str, context: str, secrets: list[Secret]) -> None:
-        requests.post(url = f"{self.host}:{self.port}/cryptvault", data = {
+    def post_secrets(self, guid: str, context: str, secrets: list[Secret]) -> int:
+        response = requests.post(url = f"{self.host}:{self.port}/cryptvault", data = {
             'guid': guid,
             'context': context,
             'secrets': [{"key": secret.key, "value": secret.value} for secret in secrets]
         })
 
+        return response.status_code
+
     
     def __create_guid(self):
-        if not os.path.exists("~/.cryptvault/guid"):
-            guid = f"{uuid.uuid1()}-{uuid.uuid4()}"
-            with open('~/.cryptvault/guid', 'w') as file:
+        base_path = os.path.expanduser('~/.cryptvault')
+        if not os.path.exists(base_path):
+            os.mkdir(base_path)
+
+        if not os.path.exists(f"{base_path}/guid"):
+            guid      = f"{uuid.uuid1()}-{uuid.uuid4()}"
+            guid_path = os.path.expanduser(f"{base_path}/guid")
+            with open(guid_path, 'w') as file:
                 file.write(guid)

@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 
-from cryptvault.vault import decrypt_secret, create_hashed_secret_key, RegisterManager, RequestSecret
+from cryptvault.vault import decrypt_secret, create_hashed_secret_key, RegisterManager
 
 
 get_router = APIRouter()
