@@ -61,7 +61,7 @@ class Registry(RegisterHandle):
         self.__store_secret_key(secret_key)
 
 
-    def store_secrets(self, secrets: list[Secret]):
+    def store_secrets(self, secrets: list[Secret]) -> None:
         with open(f'{self.base_path}/{self.context}.txt', 'r') as file:
             secret_key = base64.b64decode(file.read())
 

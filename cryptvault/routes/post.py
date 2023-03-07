@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi          import APIRouter, Body
 
 from cryptvault.vault import Registry, InSecrets, create_hashed_secret_key
 
@@ -13,7 +13,7 @@ async def addSecrets(secret_in: InSecrets = Body(embed = False)):
 
     hashed_secret_key = create_hashed_secret_key(guid)
 
-    registry   = Registry(context = context, secret_key = hashed_secret_key)
+    registry = Registry(context = context, secret_key = hashed_secret_key)
     registry.store_secrets(secrets)
 
     return {'message': 'Encryption of Secrets was successful'}

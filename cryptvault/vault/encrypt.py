@@ -1,5 +1,4 @@
 import secrets
-import base64
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from hashlib import blake2b

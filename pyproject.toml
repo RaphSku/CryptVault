@@ -2,7 +2,7 @@
 name = "cryptvault"
 version = "0.1.0"
 description = ""
-authors = ["RapSku <raphaelskuza@gmail.com>"]
+authors = ["RapSku <rapsku.dev@gmail.com>"]
 repository = "https://github.com/RaphSku/CryptVault"
 readme = "README.md"
 license = "Apache-2.0"
@@ -18,9 +18,13 @@ pyarrow = "^10.0.0"
 pandas = "^1.5.1"
 click = "^8.1.3"
 requests = "^2.28.1"
+rich = "^13.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"
+
+[tool.poetry.group.dev.dependencies]
+httpx = "^0.23.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
