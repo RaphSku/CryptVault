@@ -1,4 +1,5 @@
 import io
+import sys
 
 from click.core       import Command, Context
 from click.formatting import HelpFormatter
@@ -6,13 +7,35 @@ from rich.console     import Console
 from rich.text        import Text
 from rich.panel       import Panel
 
+from cryptvault._colors import OriginalColors, WinColors
+
+
+class HeadlineMixin:
+    def get_headline(self, command: str, description: str) -> Text:
+        headline_accent_color = OriginalColors.HEADLINE_ACCENT_COLOR
+        if sys.platform == "win32":
+            headline_accent_color = WinColors.HEADLINE_ACCENT_COLOR
+        
+        headline = Text()
+        headline.append("Usage: ", style = f"bold {headline_accent_color}")
+        headline.append(f"cryptvault {command} [OPTIONS]", style = "bold white")
+        headline.append("\n\n")
+        headline.append(description, style = "bold white")
+        headline.append("\n\n") 
+
+        return headline
+
 
 class OptionMixin:
     def format_option_text(self, flags, descriptions) -> Text:
         # structure: [--][15][2 whitespaces][-2c][5 whitespaces][80], total = 107c
-        primary_color        = "rgb(151, 245, 191)"
-        primary_color_shadow = "rgb(40, 198, 106)"
-        text_color           = "white"
+        primary_color         = OriginalColors.PRIMARY_COLOR
+        primary_color_shadow  = OriginalColors.PRIMARY_COLOR_SHADOW
+        text_color            = OriginalColors.TEXT_COLOR
+        if sys.platform == "win32":
+            primary_color         = WinColors.PRIMARY_COLOR
+            primary_color_shadow  = WinColors.PRIMARY_COLOR_SHADOW
+            text_color            = WinColors.TEXT_COLOR
 
         option_text = Text()
         option_text.append("\n")
@@ -39,12 +62,8 @@ class StartCommand(Command, OptionMixin):
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
 
-        headline = Text()
-        headline.append("Usage: ", style = "bold yellow")
-        headline.append("cryptvault start [OPTIONS]", style = "bold white")
-        headline.append("\n\n")
-        headline.append("Starts the CryptVault Server", style = "bold white")
-        headline.append("\n\n")
+        headline_description = "Starts the CryptVault Server"
+        headline = self.get_headline(command = "start", description = headline_description)
 
         flags = {
             "--host": "-h",
@@ -76,12 +95,8 @@ class VersionCommand(Command, OptionMixin):
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
 
-        headline = Text()
-        headline.append("Usage: ", style = "bold yellow")
-        headline.append("cryptvault version [OPTIONS]", style = "bold white")
-        headline.append("\n\n")
-        headline.append("Prints the current version of the CryptVault library", style = "bold white")
-        headline.append("\n\n")
+        headline_description = "Prints the current version of the CryptVault library"
+        headline = self.get_headline(command = "version", description = headline_description)
 
         flags = {
             "--help": ""
@@ -100,17 +115,13 @@ class VersionCommand(Command, OptionMixin):
         formatter.write(string_io.getvalue())
 
 
-class GenerateCommand(Command, OptionMixin):
+class GenerateCommand(Command, HeadlineMixin, OptionMixin):
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
 
-        headline = Text()
-        headline.append("Usage: ", style = "bold yellow")
-        headline.append("cryptvault generate [OPTIONS]", style = "bold white")
-        headline.append("\n\n")
-        headline.append("Generates a JSON body template for a post request", style = "bold white")
-        headline.append("\n\n")
+        headline_description = "Generates a JSON body template for a post request"
+        headline = self.get_headline(command = "generate", description = headline_description)
 
         flags = {
             "--help": ""

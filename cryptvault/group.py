@@ -1,11 +1,14 @@
 import click
 import io
+import sys
 
 from click.core       import Context
 from click.formatting import HelpFormatter
 from rich.console     import Console
 from rich.text        import Text
 from rich.panel       import Panel
+
+from cryptvault._colors import OriginalColors, WinColors
 
 
 class CustomGroup(click.Group):
@@ -22,8 +25,16 @@ class CustomGroup(click.Group):
            |___/|_|                                                           
         """
 
+        headline_accent_color = OriginalColors.HEADLINE_ACCENT_COLOR
+        primary_color         = OriginalColors.PRIMARY_COLOR
+        text_color            = OriginalColors.TEXT_COLOR
+        if sys.platform == "win32":
+            headline_accent_color = WinColors.HEADLINE_ACCENT_COLOR
+            primary_color         = WinColors.PRIMARY_COLOR
+            text_color            = WinColors.TEXT_COLOR
+
         headline = Text()
-        headline.append("Usage: ", style = "bold yellow")
+        headline.append("Usage: ", style = f"bold {headline_accent_color}")
         headline.append("cryptvault COMMAND [OPTIONS]", style = "bold white")
 
         # structure: [15][2 whitespaces][5 whitespaces][80], total = 102c
@@ -38,9 +49,6 @@ class CustomGroup(click.Group):
             "Start me already. Kick off this CryptVault server.",
             "If you need a JSON template of the body for posting a request, let me know."
         ]
-
-        primary_color = "rgb(151, 245, 191)"
-        text_color    = "white"
 
         help_text = Text()
         help_text.append("\n")
