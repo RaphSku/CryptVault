@@ -82,7 +82,7 @@ class StartCommand(Command, HeadlineMixin, OptionMixin):
         ]
 
         option_text   = self.format_option_text(flags = flags, descriptions = descriptions)
-        options_panel = Panel(option_text, title = "cryptvault version", title_align = "left")
+        options_panel = Panel(option_text, title = "cryptvault start", title_align = "left")
 
         console.print(headline,
                       options_panel)
@@ -132,7 +132,7 @@ class GenerateCommand(Command, HeadlineMixin, OptionMixin):
         ]
 
         option_text   = self.format_option_text(flags = flags, descriptions = descriptions)
-        options_panel = Panel(option_text, title = "cryptvault version", title_align = "left")
+        options_panel = Panel(option_text, title = "cryptvault generate", title_align = "left")
 
         console.print(headline,
                       options_panel)
