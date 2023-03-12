@@ -12,7 +12,7 @@ from cryptvault.vault.encrypt import encrypt_secrets
 
 
 class RegisterHandle:
-    base_path: Path = os.path.expanduser("~/cryptvault")
+    base_path: Path = Path(os.path.expanduser("~/cryptvault"))
 
 
 class RegisterManager(RegisterHandle):
@@ -23,7 +23,7 @@ class RegisterManager(RegisterHandle):
 
     
     def get_secret_key(self, context: str) -> bytes:
-        with open(f'{self.base_path}/{context}.txt', 'r') as file:
+        with open(os.path.join(self.base_path, f"{context}.txt"), 'r') as file:
             secret_key = base64.b64decode(file.read())
 
         return secret_key
@@ -62,7 +62,7 @@ class Registry(RegisterHandle):
 
 
     def store_secrets(self, secrets: list[Secret]) -> None:
-        with open(f'{self.base_path}/{self.context}.txt', 'r') as file:
+        with open(os.path.join(self.base_path, f"{self.context}.txt"), 'r') as file:
             secret_key = base64.b64decode(file.read())
 
         encrypted_secrets = encrypt_secrets(secrets, secret_key = secret_key)
@@ -79,10 +79,9 @@ class Registry(RegisterHandle):
 
 
     def __store_secret_key(self, secret_key: bytes):
-        with open(f'{self.base_path}/{self.context}.txt', 'w') as file:
+        with open(os.path.join(self.base_path, f"{self.context}.txt"), 'w') as file:
             file.write(base64.b64encode(secret_key).decode('utf-8'))
 
 
     def __create_registry_directory(self):
-        if not os.path.exists(self.base_path):
-            os.mkdir(self.base_path)
+        self.base_path.mkdir()

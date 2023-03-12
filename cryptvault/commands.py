@@ -57,7 +57,7 @@ class OptionMixin:
         return option_text
 
 
-class StartCommand(Command, OptionMixin):
+class StartCommand(Command, HeadlineMixin, OptionMixin):
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
@@ -90,7 +90,7 @@ class StartCommand(Command, OptionMixin):
         formatter.write(string_io.getvalue())
 
 
-class VersionCommand(Command, OptionMixin):
+class VersionCommand(Command, HeadlineMixin, OptionMixin):
     def format_help(self, ctx: Context, formatter: HelpFormatter) -> None:
         string_io = io.StringIO()
         console   = Console(file = string_io, force_terminal = True)
