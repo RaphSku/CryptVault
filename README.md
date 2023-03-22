@@ -42,3 +42,9 @@ curl --location '<host>:<port>/cryptvault' \
   }'
 ```
 in order to store 2 secrets under a context and guid. A guid is used in order to identify you as being the holder of the secrets and a context is applied for grouping.
+
+If you need to get a secret back, just use the following GET request via curl:
+```bash
+curl --location '<host>:<port>/cryptvault?guid=<guid>&key=<key1>&context=<context>'
+```
+This guid will be compared with the guid that the registry manages, if those two matches, you get your secret back, otherwise your request will get rejected.
