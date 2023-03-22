@@ -48,3 +48,5 @@ If you need to get a secret back, just use the following GET request via curl:
 curl --location '<host>:<port>/cryptvault?guid=<guid>&key=<key1>&context=<context>'
 ```
 This guid will be compared with the guid that the registry manages, if those two matches, you get your secret back, otherwise your request will get rejected.
+
+### Case 2: Client Wrapper
