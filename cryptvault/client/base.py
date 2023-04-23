@@ -10,6 +10,7 @@ from cryptvault.vault import Secret
 class Client:
     host: str = attrs.field(factory = str)
     port: str = attrs.field(factory = str)
+    tls: str  = attrs.field(factory = bool)
 
     def __init__(self, host: str, port: str, tls: bool) -> None:
         self.host = host
