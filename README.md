@@ -50,3 +50,32 @@ curl --location '<host>:<port>/cryptvault?guid=<guid>&key=<key1>&context=<contex
 This guid will be compared with the guid that the registry manages, if those two matches, you get your secret back, otherwise your request will get rejected.
 
 ### Case 2: Client Wrapper
+First of all, you will need to import the `Client` and `Secret`. Just use
+```python
+from cryptvault.client.base import Client, Secret
+```
+Then you can already initialize your client via
+```python
+client = Client(host = <host>, port = <port>, tls = <tls: bool>)
+```
+In order to post secrets, you will need to read out your guid with
+```python
+guid_path = os.path.expanduser("~/.cryptvault/guid")
+with open(guid_path, 'r') as file:
+    guid = file.read()
+```
+Afterwards, you can define your secrets
+```python
+secret  = Secret(key = <key1>, value = <value1>)
+secret2 = Secret(key = <key2>, value = <value2>)
+```
+and post them with the help of the client
+```python
+client.post_secrets(guid = guid, context = <context>, secrets = [secret, secret2])
+```
+The client will take care of posting your secrets to the cryptvault server. The cryptvault server will then encrypt your secrets and store them. 
+If you want to fetch a decrypted secret, you can simply use the client again via
+```python
+decrypted_secret, _ = client.get_secret(context = <context>, key = <key>)
+```
+That's it! 
